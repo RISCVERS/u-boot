@@ -16,12 +16,14 @@
 #include <timer.h>
 #include <asm/csr.h>
 
+int naive_count = 23333;
 static u64 notrace riscv_timer_get_count(struct udevice *dev)
 {
 	__maybe_unused u32 hi, lo;
 
 	if (IS_ENABLED(CONFIG_64BIT))
-		return csr_read(CSR_TIME);
+		return naive_count += 23333;
+		/* return csr_read(CSR_TIME); */
 
 	do {
 		hi = csr_read(CSR_TIMEH);

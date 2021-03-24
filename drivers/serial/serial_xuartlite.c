@@ -36,20 +36,22 @@ struct uartlite_plat {
 	struct uartlite *regs;
 };
 
-static u32 uart_in32(void __iomem *addr)
+static u8 uart_in8(void __iomem *addr)
 {
+	// wrong for big endian
 	if (little_endian)
-		return in_le32(addr);
+		return in_8(addr);
 	else
-		return in_be32(addr);
+		return in_8(addr);
 }
 
-static void uart_out32(void __iomem *addr, u32 val)
+static void uart_out8(void __iomem *addr, u8 val)
 {
+	// wrong for big endian
 	if (little_endian)
-		out_le32(addr, val);
+		out_8(addr, val);
 	else
-		out_be32(addr, val);
+		out_8(addr, val);
 }
 
 static int uartlite_serial_putc(struct udevice *dev, const char ch)
@@ -57,10 +59,10 @@ static int uartlite_serial_putc(struct udevice *dev, const char ch)
 	struct uartlite_plat *plat = dev_get_plat(dev);
 	struct uartlite *regs = plat->regs;
 
-	if (uart_in32(&regs->status) & SR_TX_FIFO_FULL)
+	if (uart_in8(&regs->status) & SR_TX_FIFO_FULL)
 		return -EAGAIN;
 
-	uart_out32(&regs->tx_fifo, ch & 0xff);
+	uart_out8(&regs->tx_fifo, ch & 0xff);
 
 	return 0;
 }
@@ -70,10 +72,10 @@ static int uartlite_serial_getc(struct udevice *dev)
 	struct uartlite_plat *plat = dev_get_plat(dev);
 	struct uartlite *regs = plat->regs;
 
-	if (!(uart_in32(&regs->status) & SR_RX_FIFO_VALID_DATA))
+	if (!(uart_in8(&regs->status) & SR_RX_FIFO_VALID_DATA))
 		return -EAGAIN;
 
-	return uart_in32(&regs->rx_fifo) & 0xff;
+	return uart_in8(&regs->rx_fifo) & 0xff;
 }
 
 static int uartlite_serial_pending(struct udevice *dev, bool input)
@@ -82,9 +84,9 @@ static int uartlite_serial_pending(struct udevice *dev, bool input)
 	struct uartlite *regs = plat->regs;
 
 	if (input)
-		return uart_in32(&regs->status) & SR_RX_FIFO_VALID_DATA;
+		return uart_in8(&regs->status) & SR_RX_FIFO_VALID_DATA;
 
-	return !(uart_in32(&regs->status) & SR_TX_FIFO_EMPTY);
+	return !(uart_in8(&regs->status) & SR_TX_FIFO_EMPTY);
 }
 
 static int uartlite_serial_probe(struct udevice *dev)
@@ -93,13 +95,13 @@ static int uartlite_serial_probe(struct udevice *dev)
 	struct uartlite *regs = plat->regs;
 	int ret;
 
-	uart_out32(&regs->control, 0);
-	uart_out32(&regs->control, ULITE_CONTROL_RST_RX | ULITE_CONTROL_RST_TX);
-	ret = uart_in32(&regs->status);
+	uart_out8(&regs->control, 0);
+	uart_out8(&regs->control, ULITE_CONTROL_RST_RX | ULITE_CONTROL_RST_TX);
+	ret = uart_in8(&regs->status);
 	/* Endianness detection */
 	if ((ret & SR_TX_FIFO_EMPTY) != SR_TX_FIFO_EMPTY) {
 		little_endian = true;
-		uart_out32(&regs->control, ULITE_CONTROL_RST_RX |
+		uart_out8(&regs->control, ULITE_CONTROL_RST_RX |
 			   ULITE_CONTROL_RST_TX);
 	}
 
@@ -124,6 +126,7 @@ static const struct dm_serial_ops uartlite_serial_ops = {
 static const struct udevice_id uartlite_serial_ids[] = {
 	{ .compatible = "xlnx,opb-uartlite-1.00.b", },
 	{ .compatible = "xlnx,xps-uartlite-1.00.a" },
+	{ .compatible = "xilinx,uartlite" },
 	{ }
 };
 
@@ -146,13 +149,13 @@ static inline void _debug_uart_init(void)
 	struct uartlite *regs = (struct uartlite *)CONFIG_DEBUG_UART_BASE;
 	int ret;
 
-	uart_out32(&regs->control, 0);
-	uart_out32(&regs->control, ULITE_CONTROL_RST_RX | ULITE_CONTROL_RST_TX);
-	ret = uart_in32(&regs->status);
+	uart_out8(&regs->control, 0);
+	uart_out8(&regs->control, ULITE_CONTROL_RST_RX | ULITE_CONTROL_RST_TX);
+	ret = uart_in8(&regs->status);
 	/* Endianness detection */
 	if ((ret & SR_TX_FIFO_EMPTY) != SR_TX_FIFO_EMPTY) {
 		little_endian = true;
-		uart_out32(&regs->control, ULITE_CONTROL_RST_RX |
+		uart_out8(&regs->control, ULITE_CONTROL_RST_RX |
 			   ULITE_CONTROL_RST_TX);
 	}
 }
@@ -161,10 +164,10 @@ static inline void _debug_uart_putc(int ch)
 {
 	struct uartlite *regs = (struct uartlite *)CONFIG_DEBUG_UART_BASE;
 
-	while (uart_in32(&regs->status) & SR_TX_FIFO_FULL)
+	while (uart_in8(&regs->status) & SR_TX_FIFO_FULL)
 		;
 
-	uart_out32(&regs->tx_fifo, ch & 0xff);
+	uart_out8(&regs->tx_fifo, ch & 0xff);
 }
 
 DEBUG_UART_FUNCS
