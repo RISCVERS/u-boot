@@ -2882,7 +2882,8 @@ int mmc_start_init(struct mmc *mmc)
 		return -ENOMEDIUM;
 	}
 
-	err = mmc_get_op_cond(mmc);
+	// err = mmc_get_op_cond(mmc);
+	err = 0;
 
 	if (!err)
 		mmc->init_in_progress = 1;

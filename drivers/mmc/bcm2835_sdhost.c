@@ -33,9 +33,9 @@
 #include <common.h>
 #include <dm.h>
 #include <mmc.h>
-#include <asm/arch/msg.h>
-#include <asm/arch/mbox.h>
-#include <asm/unaligned.h>
+//#include <asm/arch/msg.h>
+//#include <asm/arch/mbox.h>
+//#include <asm/unaligned.h>
 #include <dm/device_compat.h>
 #include <linux/bitops.h>
 #include <linux/bug.h>
@@ -44,7 +44,7 @@
 #include <linux/io.h>
 #include <linux/iopoll.h>
 #include <linux/sizes.h>
-#include <mach/gpio.h>
+//#include <mach/gpio.h>
 #include <power/regulator.h>
 
 #define msleep(a) udelay(a * 1000)
@@ -185,34 +185,34 @@ struct bcm2835_host {
 
 static void bcm2835_dumpregs(struct bcm2835_host *host)
 {
-	dev_dbg(host->dev, "=========== REGISTER DUMP ===========\n");
-	dev_dbg(host->dev, "SDCMD  0x%08x\n", readl(host->ioaddr + SDCMD));
-	dev_dbg(host->dev, "SDARG  0x%08x\n", readl(host->ioaddr + SDARG));
-	dev_dbg(host->dev, "SDTOUT 0x%08x\n", readl(host->ioaddr + SDTOUT));
-	dev_dbg(host->dev, "SDCDIV 0x%08x\n", readl(host->ioaddr + SDCDIV));
-	dev_dbg(host->dev, "SDRSP0 0x%08x\n", readl(host->ioaddr + SDRSP0));
-	dev_dbg(host->dev, "SDRSP1 0x%08x\n", readl(host->ioaddr + SDRSP1));
-	dev_dbg(host->dev, "SDRSP2 0x%08x\n", readl(host->ioaddr + SDRSP2));
-	dev_dbg(host->dev, "SDRSP3 0x%08x\n", readl(host->ioaddr + SDRSP3));
-	dev_dbg(host->dev, "SDHSTS 0x%08x\n", readl(host->ioaddr + SDHSTS));
-	dev_dbg(host->dev, "SDVDD  0x%08x\n", readl(host->ioaddr + SDVDD));
-	dev_dbg(host->dev, "SDEDM  0x%08x\n", readl(host->ioaddr + SDEDM));
-	dev_dbg(host->dev, "SDHCFG 0x%08x\n", readl(host->ioaddr + SDHCFG));
-	dev_dbg(host->dev, "SDHBCT 0x%08x\n", readl(host->ioaddr + SDHBCT));
-	dev_dbg(host->dev, "SDHBLC 0x%08x\n", readl(host->ioaddr + SDHBLC));
-	dev_dbg(host->dev, "===========================================\n");
+	printf("=========== REGISTER DUMP ===========\n");
+	printf("SDCMD  0x%08x\n", readl(host->ioaddr + SDCMD));
+	printf("SDARG  0x%08x\n", readl(host->ioaddr + SDARG));
+	//printf("SDTOUT 0x%08x\n", readl(host->ioaddr + SDTOUT));
+	//printf("SDCDIV 0x%08x\n", readl(host->ioaddr + SDCDIV));
+	printf("SDRSP0 0x%08x\n", readl(host->ioaddr + SDRSP0));
+	printf("SDRSP1 0x%08x\n", readl(host->ioaddr + SDRSP1));
+	printf("SDRSP2 0x%08x\n", readl(host->ioaddr + SDRSP2));
+	printf("SDRSP3 0x%08x\n", readl(host->ioaddr + SDRSP3));
+	printf("SDHSTS 0x%08x\n", readl(host->ioaddr + SDHSTS));
+	//printf("SDVDD  0x%08x\n", readl(host->ioaddr + SDVDD));
+	printf("SDEDM  0x%08x\n", readl(host->ioaddr + SDEDM));
+	printf("SDHCFG 0x%08x\n", readl(host->ioaddr + SDHCFG));
+	printf("SDHBCT 0x%08x\n", readl(host->ioaddr + SDHBCT));
+	printf("SDHBLC 0x%08x\n", readl(host->ioaddr + SDHBLC));
+	printf("===========================================\n");
 }
 
 static void bcm2835_reset_internal(struct bcm2835_host *host)
 {
 	u32 temp;
 
-	writel(SDVDD_POWER_OFF, host->ioaddr + SDVDD);
+	// writel(SDVDD_POWER_OFF, host->ioaddr + SDVDD);
 	writel(0, host->ioaddr + SDCMD);
 	writel(0, host->ioaddr + SDARG);
 	/* Set timeout to a big enough value so we don't hit it */
-	writel(0xf00000, host->ioaddr + SDTOUT);
-	writel(0, host->ioaddr + SDCDIV);
+	// writel(0xf00000, host->ioaddr + SDTOUT);
+	// writel(0, host->ioaddr + SDCDIV);
 	/* Clear status register */
 	writel(SDHSTS_CLEAR_MASK, host->ioaddr + SDHSTS);
 	writel(0, host->ioaddr + SDHCFG);
@@ -225,15 +225,15 @@ static void bcm2835_reset_internal(struct bcm2835_host *host)
 		  (SDEDM_THRESHOLD_MASK << SDEDM_WRITE_THRESHOLD_SHIFT));
 	temp |= (FIFO_READ_THRESHOLD << SDEDM_READ_THRESHOLD_SHIFT) |
 		(FIFO_WRITE_THRESHOLD << SDEDM_WRITE_THRESHOLD_SHIFT);
-	writel(temp, host->ioaddr + SDEDM);
+	// writel(temp, host->ioaddr + SDEDM);
 	/* Wait for FIFO threshold to populate */
 	msleep(20);
-	writel(SDVDD_POWER_ON, host->ioaddr + SDVDD);
+	// writel(SDVDD_POWER_ON, host->ioaddr + SDVDD);
 	/* Wait for all components to go through power on cycle */
 	msleep(20);
 	host->clock = 0;
 	writel(host->hcfg, host->ioaddr + SDHCFG);
-	writel(host->cdiv, host->ioaddr + SDCDIV);
+	// writel(host->cdiv, host->ioaddr + SDCDIV);
 }
 
 static int bcm2835_wait_transfer_complete(struct bcm2835_host *host)
@@ -253,8 +253,8 @@ static int bcm2835_wait_transfer_complete(struct bcm2835_host *host)
 		if ((fsm == SDEDM_FSM_READWAIT) ||
 		    (fsm == SDEDM_FSM_WRITESTART1) ||
 		    (fsm == SDEDM_FSM_READDATA)) {
-			writel(edm | SDEDM_FORCE_DATA_MODE,
-			       host->ioaddr + SDEDM);
+			// writel(edm | SDEDM_FORCE_DATA_MODE,
+			//       host->ioaddr + SDEDM);
 			break;
 		}
 
@@ -399,11 +399,11 @@ static u32 bcm2835_read_wait_sdcmd(struct bcm2835_host *host)
 	int timeout_us = SDHST_TIMEOUT_MAX_USEC;
 
 	ret = readl_poll_timeout(host->ioaddr + SDCMD, value,
-				 !(value & SDCMD_NEW_FLAG), timeout_us);
+				/* !(value & SDCMD_NEW_FLAG)*/ true, timeout_us);
 	if (ret == -ETIMEDOUT)
 		printf("%s: timeout (%d us)\n", __func__, timeout_us);
 
-	return value;
+	return value & (~SDCMD_NEW_FLAG);
 }
 
 static int bcm2835_send_command(struct bcm2835_host *host, struct mmc_cmd *cmd,
@@ -456,7 +456,7 @@ static int bcm2835_send_command(struct bcm2835_host *host, struct mmc_cmd *cmd,
 		if (data->flags & MMC_DATA_READ)
 			sdcmd |= SDCMD_READ_CMD;
 	}
-
+	printf("BCM2835: sdcmd = %d\n", sdcmd);
 	writel(sdcmd | SDCMD_NEW_FLAG, host->ioaddr + SDCMD);
 
 	return 0;
@@ -625,7 +625,7 @@ static void bcm2835_set_clock(struct bcm2835_host *host, unsigned int clock)
 		 * to show willing
 		 */
 		host->cdiv = SDCDIV_MAX_CDIV;
-		writel(host->cdiv, host->ioaddr + SDCDIV);
+		// writel(host->cdiv, host->ioaddr + SDCDIV);
 		return;
 	}
 
@@ -648,10 +648,10 @@ static void bcm2835_set_clock(struct bcm2835_host *host, unsigned int clock)
 		((host->mmc->card_caps & MMC_MODE_4BIT) ? 8 : 32);
 
 	host->cdiv = div;
-	writel(host->cdiv, host->ioaddr + SDCDIV);
+	// writel(host->cdiv, host->ioaddr + SDCDIV);
 
 	/* Set the timeout to 500ms */
-	writel(host->mmc->clock / 2, host->ioaddr + SDTOUT);
+	// writel(host->mmc->clock / 2, host->ioaddr + SDTOUT);
 }
 
 static inline int is_power_of_2(u64 x)
@@ -707,6 +707,7 @@ static int bcm2835_send_cmd(struct udevice *dev, struct mmc_cmd *cmd,
 
 static int bcm2835_set_ios(struct udevice *dev)
 {
+	/*
 	struct bcm2835_host *host = dev_get_priv(dev);
 	struct mmc *mmc = mmc_get_mmc_dev(dev);
 
@@ -714,18 +715,22 @@ static int bcm2835_set_ios(struct udevice *dev)
 		bcm2835_set_clock(host, mmc->clock);
 		host->clock = mmc->clock;
 	}
+	*/
 
 	/* set bus width */
+	/*
 	host->hcfg &= ~SDHCFG_WIDE_EXT_BUS;
 	if (mmc->bus_width == 4)
 		host->hcfg |= SDHCFG_WIDE_EXT_BUS;
 
 	host->hcfg |= SDHCFG_WIDE_INT_BUS;
-
+	*/
 	/* Disable clever clock switching, to cope with fast core clocks */
+	/*
 	host->hcfg |= SDHCFG_SLOW_CARD;
 
 	writel(host->hcfg, host->ioaddr + SDHCFG);
+	*/
 
 	return 0;
 }
@@ -774,7 +779,7 @@ static int bcm2835_probe(struct udevice *dev)
 	if (!host->ioaddr)
 		return -ENOMEM;
 
-	host->max_clk = bcm2835_get_mmc_clock(BCM2835_MBOX_CLOCK_ID_CORE);
+	//host->max_clk = bcm2835_get_mmc_clock(BCM2835_MBOX_CLOCK_ID_CORE);
 
 	bcm2835_add_host(host);
 
@@ -785,6 +790,7 @@ static int bcm2835_probe(struct udevice *dev)
 
 static const struct udevice_id bcm2835_match[] = {
 	{ .compatible = "brcm,bcm2835-sdhost" },
+	{ .compatible = "nemu-sdhost"         },
 	{ }
 };
 

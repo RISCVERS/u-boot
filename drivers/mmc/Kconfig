@@ -399,7 +399,6 @@ config RENESAS_SDHI
 
 config MMC_BCM2835
 	bool "BCM2835 family custom SD/MMC Host Controller support"
-	depends on ARCH_BCM283X
 	depends on BLK && DM_MMC
 	depends on OF_CONTROL
 	default y
