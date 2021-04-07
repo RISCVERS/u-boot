@@ -114,7 +114,7 @@ dtb-$(CONFIG_ROCKCHIP_RK3328) += \
 	rk3328-rock-pi-e.dtb
 
 dtb-$(CONFIG_ROCKCHIP_RK3368) += \
-	rk3368-lion.dtb \
+	rk3368-lion-haikou.dtb \
 	rk3368-sheep.dtb \
 	rk3368-geekbox.dtb \
 	rk3368-px5-evb.dtb \
@@ -131,7 +131,9 @@ dtb-$(CONFIG_ROCKCHIP_RK3399) += \
 	rk3399-nanopc-t4.dtb \
 	rk3399-nanopi-m4.dtb \
 	rk3399-nanopi-m4-2gb.dtb \
+	rk3399-nanopi-m4b.dtb \
 	rk3399-nanopi-neo4.dtb \
+	rk3399-nanopi-r4s.dtb \
 	rk3399-orangepi.dtb \
 	rk3399-pinebook-pro.dtb \
 	rk3399-puma-haikou.dtb \
@@ -822,6 +824,10 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	r8a774a1-beacon-rzg2m-kit.dtb \
 	r8a774b1-beacon-rzg2n-kit.dtb \
 	r8a774e1-beacon-rzg2h-kit.dtb \
+	r8a774a1-hihope-rzg2m-u-boot.dtb \
+	r8a774b1-hihope-rzg2n-u-boot.dtb \
+	r8a774c0-ek874-u-boot.dtb \
+	r8a774e1-hihope-rzg2h-u-boot.dtb \
 	r8a77950-ulcb-u-boot.dtb \
 	r8a77950-salvator-x-u-boot.dtb \
 	r8a77960-ulcb-u-boot.dtb \
@@ -1009,6 +1015,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += \
 	mt7622-bananapi-bpi-r64.dtb \
 	mt7623n-bananapi-bpi-r2.dtb \
 	mt7629-rfb.dtb \
+	mt8183-pumpkin.dtb \
 	mt8512-bm1-emmc.dtb \
 	mt8516-pumpkin.dtb \
 	mt8518-ap1-emmc.dtb
